@@ -87,6 +87,8 @@ input {
   flex-direction: column;
   gap: 3.2rem;
   align-items: center;
+
+  scrollbar-width: none;
 }
 
 .actions button,
@@ -108,6 +110,7 @@ input {
   gap: 1.2rem;
   justify-content: center;
   align-content: start;
+  scrollbar-width: none;
 }
 
 .list li {
