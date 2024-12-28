@@ -1,17 +1,27 @@
-import { use, useState } from "react";
-import { CLSThresholds } from "web-vitals";
-
-const initialItems = [
-  { id: 1, description: "Passports", quantity: 2, packed: false },
-  { id: 2, description: "Socks", quantity: 12, packed: false },
-];
+import { useState } from "react";
 
 export default function App() {
+  const [items, setItems] = useState([]);
+
+   //NOT ALLOOWED TO MUTATE STATES 
+  function handleAddItems(item) {
+    setItems(items => [...items , item])
+  }
+
+  function handlDeleteItem(id) {
+    setItems(items => items.filter(item => item.id !== id));
+  }
+
+  //Looping through the array to find the correct ID through mapping
+  function handleToggleItem(id){
+    setItems(items => items.map(item => item.id === id ? {...item, packed: !item.packed} : item))
+  }
+
   return (
     <div className="app">
       <Logo />
-      <Form />
-      <PackingList />
+      <Form onAddItems={handleAddItems}/>
+      <PackingList items={items} onDeleteItem = {handlDeleteItem} onToggleItems={handleToggleItem}/>
       <Stats />
     </div>
   );
@@ -23,10 +33,11 @@ function Logo() {
 
 //basically creating forms in Javascript with empty arrays and then
 //maping the length with the lements to create an option list with them
-function Form() {
+function Form({onAddItems}) {
   //Controlled elements to keep data and push it , need to use the function useState
   const [description, setDescription] = useState("");
-  const [quantity, setQuantity] = useState(5);
+  const [quantity, setQuantity] = useState(1);
+
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -36,6 +47,8 @@ function Form() {
     const newItem = { description, quantity, packed: false, id: Date.now() };
 
     console.log(newItem);
+
+    onAddItems(newItem);
 
     setDescription("");
     setQuantity(1);
@@ -65,25 +78,29 @@ function Form() {
   );
 }
 
-function PackingList() {
+function PackingList({items , onDeleteItem , onToggleItems}) {
   return (
     <div className="list">
       <ul>
-        {initialItems.map((item) => (
-          <Item item={item} key={item.id} />
+        {items.map((item) => (
+          <Item item={item} key={item.id} onDeleteItem={onDeleteItem} onToggleItems={onToggleItems}/>
         ))}
       </ul>
     </div>
   );
 }
 
-function Item({ item }) {
+function Item({ item , onDeleteItem , onToggleItems}) {
   return (
     <li>
+      <input type='checkbox' value={item.packed} onChange={() => onToggleItems(item.id)}/>
       <span style={item.packed ? { textDecoration: "line-through" } : {}}>
         {item.quantity} {item.description}
       </span>
-      <button> ❌ </button>
+      <button onClick = {() => {
+        console.log(item.id);
+        
+        onDeleteItem(item.id)}}> ❌ </button>
     </li>
   );
 }
